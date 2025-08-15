@@ -2,14 +2,14 @@
 close all; clear; clc;
 
 %% test variables
-file = modelFile; %"dnnv2"; %"pinn9_5_256_5000"; "dnnv2_model" "model/dnnv2_5_128_101"
+file = "exper_model/dnn_10_256_100"; %"dnnv2"; %"pinn9_5_256_5000"; "dnnv2_model" "model/dnnv2_5_128_101"
 net = load(file).net; %dnnv2_10s_6_256_300; % dnnv2_256_6_800
 sysParams = params_system();
 ctrlParams = params_control();
 trainParams = params_training();
-trainParams.type = "dnnv2_10s"; % "dnn3","lstm3","pinn3","dnn6","lstm6","pinn6","dnn9", "lstm9","pinn9"
+trainParams.type = "dnn"; % "dnn3","lstm3","pinn3","dnn6","lstm6","pinn6","dnn9", "lstm9","pinn9"
 ctrlParams.method = "origin"; % random, interval, origin
-ctrlParams.solver = "nonstifflr";
+ctrlParams.solver = "nonstiff";
 numTime = 100;
 tSpan = [0,20]; % [0,5] 0:0.01:5
 predInterval = tSpan(2); 
@@ -41,8 +41,8 @@ if trainParams.type == "pgnn" || trainParams.type == "dnnv2"
     plot_compared_states(t,x,t,xp,"acceleration",y(:,[19 17 18]));
 end
 % solve forward kinematics and plot end effector position
-[~,~,~,~,~,~,~,~,xend,yend] = ForwardKinematics(x(:,1:5),sysParams);
-[~,~,~,~,~,~,~,~,xpend,ypend] = ForwardKinematics(xp(:,1:5),sysParams);
+[~,~,~,~,~,~,~,~,xend,yend] = ForwardKinematics(x(:,1:5),sysParams,"normal");
+[~,~,~,~,~,~,~,~,xpend,ypend] = ForwardKinematics(xp(:,1:5),sysParams,"normal");
 plot_endeffector(t,[xend yend],[xpend ypend],y(:,22:23)) %y(:,15:16)
 % make image and video
 % tPred = [1,25];

@@ -4,11 +4,12 @@ close all; clear; clc;
 %% Two-link Planar Robot on Cart Dynamics System Parameters
 sysParams = params_system();
 ctrlParams = params_control();
-ctrlParams.method = "origin";
-ctrlParams.solver = "nonstiffhr"; % "stifflr" (low-res) or "stiffhr" (high-res) or "nonstifflr" or "nonstiffhr"
+% ctrlParams.method = "origin";
+% ctrlParams.solver = "nonstiff"; % "stifflr" (low-res) or "stiffhr" (high-res) or "nonstifflr" or "nonstiff"
 % ctrlParams.noise = 0;
 % ctrlParams.sigma = 1e-2;
-tSpan = [0,40]; %[0,20]; %0:0.01:15;
+tSpan = [0,20]; %[0,20]; %0:0.01:15;
+% ctrlParams.PID3(3) = ctrlParams.PID3(3)+100;
 % ctrlParams.dt_control = 0.001; % time step difference in which new control action is calculated
 % ctrlParams.Pf = 0.1;
 % ctrlParams.Flim = 100;
@@ -119,8 +120,8 @@ plot_endeffector([xend yend],y_simscape(:,22:23)) %y(:,15:16)
 
 %% Set parameters to Tune PID w/ GA 
 N_monte_carlo = 10;
-tSpan = [0,40];
-Ts_lim = 30;
+tSpan = [0,25];
+Ts_lim = 15;
 ctrlParams.solver = "GA";
 myObj = @(gene) fitnessfun(gene, N_monte_carlo,tSpan,Ts_lim,ctrlParams,sysParams);
 % GA parameters
@@ -128,7 +129,7 @@ Pc = 0.8;
 fitfun = @(x) myObj(x);
 PopSize = 100;
 MaxGens = 200;
-nvars   = 15;
+nvars   = 9;
 A       = [];
 b       = [];
 Aeq     = [];               
@@ -136,15 +137,19 @@ beq     = [];
 % lb      = [1 0 0.1 1 0 0.1 1 0 0.1 1 0 0.1 1 0 0.1 10 0 1 10 0 1 10 0 1 10 0 1 10 0 1 0];
 % ub      = [20 1 10 20 1 10 20 1 10 20 1 10 20 1 10 100 5 30 100 5 30 100 5 30 100 5 30 100 5 30 0.5];
 lb = [ ...          
-    repmat([0 0 0], 1, 5), ...   % 5 PIDs
+    repmat([700 200 2000], 1, 2), ...   % 5 PIDs
+    [700 100 300], ...
+    %repmat([500 100 300], 1, 2), ...
     ];                      
 
 ub = [ ...
-    repmat([500 500 500], 1, 5), ...
+    repmat([1000 500 3000], 1, 2), ...
+    [1500 500 1000], ...
+    %repmat([1000 500 1000], 1, 2), ...
     ];
 nonlcon = [];
 options = optimoptions('ga', 'PopulationSize', PopSize, 'MaxGenerations',...
-    MaxGens,'PlotFcn',{@gaplotbestf,@gaplotscores},'UseParallel',false);
+    MaxGens,'PlotFcn',{@gaplotbestf,@gaplotscores},'UseParallel',true);
 options.CrossoverFraction = Pc;
 options.EliteCount = 3;
 
@@ -159,8 +164,8 @@ save("best_controller.mat","BestChrom")
 ctrlParams.PID1 = BestChrom(1:3);
 ctrlParams.PID2 = BestChrom(4:6);
 ctrlParams.PID3 = BestChrom(7:9);
-ctrlParams.PID4 = BestChrom(10:12);
-ctrlParams.PID5 = BestChrom(13:15);
+% ctrlParams.PID4 = BestChrom(10:12);
+% ctrlParams.PID5 = BestChrom(13:15);
 
 %% coulomb friction
 v = linspace(-5,5,10000);
@@ -377,8 +382,8 @@ function [fit]  = fitnessfun(gene, N_monte_carlo,tSpan,Ts_lim,ctrlParams,sysPara
 ctrlParams.PID1 = gene(1:3);
 ctrlParams.PID2 = gene(4:6);
 ctrlParams.PID3 = gene(7:9);
-ctrlParams.PID4 = gene(10:12);
-ctrlParams.PID5 = gene(13:15);
+% ctrlParams.PID4 = gene(10:12);
+% ctrlParams.PID5 = gene(13:15);
 
 e1 = zeros(1,N_monte_carlo);
 e2 = zeros(1,N_monte_carlo);
@@ -433,6 +438,6 @@ disp(mean(e5))
 disp(mean(exend))
 disp(mean(eyend))
 
-fit = 1e3*(1*(mean(e1)+mean(e2)+mean(e3)+mean(e4)+mean(e5)+mean(exend)+mean(eyend))); 
+fit = 1e3*(1*(mean(e1)+mean(e2)+mean(e3)+mean(exend)+mean(eyend))); % +mean(e4)+mean(e5)
 
 end

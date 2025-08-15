@@ -20,7 +20,7 @@ function y = robot_simulation(tSpan, x0, sysParams, ctrlParams)
                 opts = odeset(opts,'OutputFcn',@odeplot);
             end
             [t,x] = ode23(@(t,x) robot_system(t, x, noise, sysParams, ctrlParams), tSpan, x0,opts);
-        case "nonstiffhr"
+        case "nonstiff"
             % startTime = datetime;
             % stopTime = 60*5; % end sim in 60 seconds
             % opts = odeset('OutputFcn',@(t, y, flag) myOutputFcn(t, y, flag, startTime, stopTime));

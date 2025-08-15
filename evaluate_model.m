@@ -3,7 +3,6 @@ function [avgErr,errs,tPred,tSim] = evaluate_model(net, sysParams, ctrlParams, t
     % time when complicated friction involved
     theta = linspace(0,2*pi,numCase);
     rad = linspace(0,1,numCase);
-    x0el = linspace(-1,1,numCase);
     a = linspace(0,0.25,numCase);
 
     % reference time points 
@@ -20,7 +19,9 @@ function [avgErr,errs,tPred,tSim] = evaluate_model(net, sysParams, ctrlParams, t
             disp("unspecify type of model.")
     end
     for i = 1:numCase
-        x0 = [x0el(i); 0; x0el(i); 0; theta(i); 0; theta(i); 0; theta(i); 0]; % th0, th0d, th1, th1d, th2, th2d
+        % x0 = [x0el(i); 0; x0el(i); 0; theta(i); 0; theta(i); 0; theta(i); 0]; % th0, th0d, th1, th1d, th2, th2d
+        x0 = [-1; -1; 0; 0; 0] + [2; 2; 2*pi; 2*pi; 2*pi].*rand(5,1); % th0, th1, th2
+        x0 = [x0(1); 0; x0(2); 0; x0(3); 0; x0(4); 0; x0(5); 0]; % th0, th0d, th1, th1d, th2, th2d
         ctrlParams.refx = ctrlParams.xrange*rad(i)*cos(theta(i));
         ctrlParams.refy = ctrlParams.yrange*rad(i)*sin(theta(i));
         ctrlParams.a = 0.25+a(i); % target object horizontal dimension

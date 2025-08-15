@@ -7,8 +7,8 @@ clc;
 sysParams = params_system();
 ctrlParams = params_control();
 trainParams = params_training();
-trainParams.numSamples = 2000;
-trainParams.type = "pinn"; % "dnn6","pinn6","dnn9","pinn9"
+trainParams.numSamples = 100;
+trainParams.type = "dnn"; % "dnn6","pinn6","dnn9","pinn9"
 trainParams.numLayers = 8;
 trainParams.numNeurons = 256;
 trainParams.datasource = "odes";
