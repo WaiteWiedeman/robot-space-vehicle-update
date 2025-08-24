@@ -82,10 +82,7 @@ legend("$\tau_1$","$\tau_2$","$\tau_{f_1}$","$\tau_{f_2}$","Interpreter","latex"
 %% viscous friction
 th1d = linspace(-5,5,100);
 th2d = linspace(-5,5,100);
-T_f = zeros(2,length(th1d));
-for i = 1:length(th1d)
-    T_f(:,i) = friction(th1d(i),th2d(i),sysParams);
-end
+T_f = friction(th1d,th2d,sysParams);
 figure('Position',[500,100,800,800]);
 plot(th1d,T_f(1,:),'g-',th2d,T_f(2,:),'m-','LineWidth',2);
 xlabel("Angular velocity (rad/s)");
